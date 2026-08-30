@@ -27,8 +27,18 @@ children of the root.
 
 \begin{proof}
 \leanok
-Both are read off the definition: membership of $vw$ imposes the conditions of $v$ followed by
-those of $w$ for the shifted field.
+For words $v$ and $w$, the inequalities defining membership of $vw$ split at
+$\abs{v}$. The inequalities before the split say that $v\in\cT(c)$, while those after
+the split say that $w$ belongs to the sample of the shifted field
+$c_v(u)=c(vu)$. Thus
+\[
+  vw\in\cT(c)
+  \quad\Longleftrightarrow\quad
+  v\in\cT(c)\ \text{ and }\ w\in\cT(c_v).
+\]
+When $v\in\cT(c)$, this equivalence identifies the residual subtree at $v$ with
+$\cT(c_v)$. Taking $v$ to be a one-letter word and separating the empty word gives the
+decomposition at the root.
 \end{proof}
 
 \begin{definition}[The skeleton]
@@ -51,9 +61,16 @@ $\bbN$ inside the sample.
 
 \begin{proof}
 \leanok
-A vertex with infinite residual subtree has, by the pigeonhole principle over its finitely
-many children, a child with infinite residual subtree. Iterating produces the ray, and
-distances along it are computed by \cref{lem:treeDist}.
+Let $v$ lie in the skeleton. By \cref{lem:branching}, its infinite residual subtree is the
+union of its root and the residual subtrees below its finitely many children. At least one
+of these child subtrees is therefore infinite, and the corresponding child of $v$ again
+lies in the skeleton. Iterating this choice gives vertices $r(n)$ with $r(0)=v$ and
+$r(n+1)$ a child of $r(n)$.
+
+If $m\leq n$, then $r(m)$ is a prefix of $r(n)$ and their lengths differ by $n-m$.
+The distance formula in \cref{lem:treeDist} consequently gives
+$d(r(m),r(n))=n-m$. Symmetry yields $d(r(m),r(n))=\abs{m-n}$ for all $m,n$, so $r$ is an
+isometric ray contained in the skeleton.
 \end{proof}
 
 \begin{definition}[The law of the sample]
@@ -77,9 +94,17 @@ If $J\leq N$, then $\bbP(\cT \text{ finite})=q$.
 
 \begin{proof}
 \leanok
-Let $q_n$ be the probability that generation $n$ is empty. The event that generation $n+1$ is
-empty splits at the root into the offspring count there and $N$ independent copies of the
-process, so $q_{n+1}=f(q_n)$ with $q_0=0$. The iterates $f^n(0)$ increase to the least fixed
-point of $f$ in $[0,1]$, which is $q$ by \cref{lem:extinction-fixed}. Extinction is the
-increasing union of the events that some generation is empty.
+Let $E_n$ be the event that the sample has no vertex in generation $n$. Conditioning on
+the root having $j$ children and using the independence of the $j$ shifted fields gives
+\[
+  \bbP(E_{n+1}\mid c(\rt)=j)=\bbP(E_n)^j.
+\]
+Summing over $j$ yields $\bbP(E_{n+1})=f(\bbP(E_n))$. Since $E_0$ is empty, induction
+gives $\bbP(E_n)=f^n(0)$.
+
+The sequence $f^n(0)$ is increasing and bounded by every fixed point of $f$ in $[0,1]$.
+Its limit is a fixed point by continuity, and is therefore the least fixed point $q$.
+The events $E_n$ are increasing, and their union is the event that the finitely branching
+sample is finite. Continuity of measure from below now gives
+$\bbP(\cT\text{ finite})=q$.
 \end{proof}

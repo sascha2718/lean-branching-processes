@@ -31,7 +31,13 @@ $f(1)=1$, $f(0)=\theta_0$, $f$ maps $[0,1]$ into itself monotonically, and $f'(1
 
 \begin{proof}
 \leanok
-Each is a termwise computation on the finite sum.
+At $s=1$ the generating function is the total mass of $\theta$, while at $s=0$ only the
+constant term remains. If $0\leq s\leq t$, then $s^j\leq t^j$ for every $j$, and
+multiplication by the nonnegative weight $\theta_j$ followed by summation proves
+monotonicity. Taking $t=1$ shows that $f(s)\leq1$ on $[0,1]$, and nonnegativity follows in
+the same way from the nonnegativity of every summand. Since the sum is finite, we may
+differentiate it term by term. Evaluating the resulting derivative at $1$ gives
+$f'(1)=\sum_j j\theta_j=m$.
 \end{proof}
 
 \begin{definition}[Extinction probability]
@@ -57,8 +63,11 @@ $q\in[0,1]$, $f(q)=q$, and $q\leq s$ for every fixed point $s\in[0,1]$ of $f$.
 
 \begin{proof}
 \leanok
-The fixed-point set is closed, nonempty because $f(1)=1$, and bounded below by $0$, so it
-contains its infimum. Minimality is the defining property of the infimum.
+Let $A=\set{s\in[0,1]\colon f(s)=s}$. The set $A$ is nonempty because $1\in A$, bounded
+below by $0$, and closed because $f$ is continuous. A nonempty closed subset of
+$\bbR$ that is bounded below contains its infimum, so $q\in A$. This gives both
+$q\in[0,1]$ and $f(q)=q$. If $s\in[0,1]$ is any other fixed point, then $s\in A$, and the
+defining property of the infimum gives $q\leq s$.
 \end{proof}
 
 \begin{lemma}[Extinction and childlessness]
@@ -71,8 +80,10 @@ $q=0$ if and only if $\theta_0=0$; in particular $\theta_0>0$ forces $q>0$.
 
 \begin{proof}
 \leanok
-If $q=0$ then $\theta_0=f(0)=f(q)=q=0$. Conversely $\theta_0=0$ makes $0$ a fixed point, and
-minimality gives $q\leq0$.
+If $q=0$, then
+$\theta_0=f(0)=f(q)=q=0$. Conversely, if $\theta_0=0$, then $f(0)=0$, so $0$ is a fixed
+point in $[0,1]$. The minimality in \cref{lem:extinction-fixed} gives $q\leq0$, while
+$q\geq0$, and hence $q=0$.
 \end{proof}
 
 \begin{theorem}[A supercritical law survives]
@@ -85,8 +96,14 @@ If $m>1$ then $q<1$.
 
 \begin{proof}
 \leanok
-Write $1-f(s)=(1-s)g(s)$ with $g(s)=\sum_j\theta_j(1+s+\dots+s^{j-1})$, a polynomial with
-$g(1)=m>1$. By continuity $g>1$ on a left neighbourhood of $1$, so $f(s)<s$ for some $s<1$.
-Since $f(0)=\theta_0\geq0$, the intermediate value theorem produces a fixed point in $[0,s]$,
-and minimality pushes $q$ below it.
+Write
+\[
+  1-f(s)=(1-s)g(s),
+  \qquad
+  g(s)=\sum_j\theta_j(1+s+\dots+s^{j-1}).
+\]
+The polynomial $g$ satisfies $g(1)=m>1$. By continuity, we may choose $s\in(0,1)$ such
+that $g(s)>1$. Since $1-s>0$, the displayed identity gives $f(s)<s$. The continuous
+function $f(t)-t$ is nonnegative at $0$ and negative at $s$, so it has a zero
+$c\in[0,s]$. By \cref{lem:extinction-fixed}, $q\leq c\leq s<1$.
 \end{proof}

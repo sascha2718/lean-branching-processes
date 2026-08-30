@@ -43,10 +43,18 @@ within $D$ of the image of a walk from $u$ to $v$.
 
 \begin{proof}
 \leanok
-In a tree, betweenness is metric additivity, $d(u,m)+d(m,v)=d(u,v)$. Walking from $u$ to $v$
-one step at a time, the images move by at most $2D$, so some step brackets the separating
-vertex; the additivity then bounds its distance to that image by $D$. The stability constant
-is $D$ itself.
+Let $p$ be a walk from $u$ to $v$, and write $p_i$ for its $i$-th vertex. Suppose for a
+contradiction that every $f(p_i)$ is more than $D$ from $m$. We show inductively that $m$
+does not lie between $f(u)$ and $f(p_i)$. This is clear for $i=0$. If it fails for $i+1$,
+the tree property applied at $f(p_i)$ shows that $m$ lies either between $f(u)$ and
+$f(p_i)$ or between $f(p_i)$ and $f(p_{i+1})$. The first alternative contradicts the
+induction hypothesis. In the second, metric additivity and the assumed lower bounds give
+\[
+  d'(f(p_i),f(p_{i+1}))>2D.
+\]
+However, $p_i$ and $p_{i+1}$ are adjacent, so the upper quasi-isometry bound gives
+$d'(f(p_i),f(p_{i+1}))\leq2D$. At $i=n$ the induction contradicts the assumption that $m$
+lies between $f(u)$ and $f(v)$. Hence some $f(p_i)$ lies within $D$ of $m$.
 \end{proof}
 
 \begin{theorem}[Hairs against lines]
@@ -60,12 +68,27 @@ vertices lie within a bounded distance of a line.
 
 \begin{proof}
 \leanok
-Suppose $f$ is a $D$-quasi-isometry and take a hair at $c$ of depth $h$ far exceeding $D$ and
-the bound $R$ on the distance to a line. The image of $c$ sits within $R$ of a line, and one
-of the two half-rays of that line runs away from the image of the hair through the image of
-$c$. Deep points of the hair are separated from the rest of the tree by $c$, so
-\cref{lem:stability} places their images within $D$ of that image, contradicting the lower
-quasi-isometry bound once $h$ is large.
+Suppose that $f$ is a $D$-quasi-isometry, and choose a hair $P$ at $c$ of depth
+\[
+  h>D(D+R)+D^2.
+\]
+Let $x\in P$ satisfy $d(x,c)=h$. Choose a line $l$ and $k\in\bbZ$ such that
+$d'(f(x),l(k))\leq R$. One of the two directions along $l$ contains, arbitrarily far from
+$l(k)$, a vertex $z$ for which $l(k)$ lies between $f(c)$ and $z$. Coarse surjectivity
+provides $p$ with $d'(f(p),z)\leq D$. Taking $z$ sufficiently far away ensures that
+$p\notin P$, since every point of $P$ is within $h$ of $c$ and the upper quasi-isometry
+bound would otherwise keep $f(p)$ too close to $f(c)$.
+
+The vertex $l(k)$ lies between $f(c)$ and $f(p)$. Apply \cref{lem:stability} to a geodesic
+from $c$ to $p$ to obtain a vertex $y$ on that geodesic with
+$d'(f(y),l(k))\leq D$. Since $x\in P$ and $p\notin P$, the vertex $c$ separates $p$ from
+$x$. As $y$ lies between $c$ and $p$, it follows that $c$ also lies between $y$ and $x$,
+and hence $d(y,x)\geq d(c,x)=h$. On the other hand,
+$d'(f(y),f(x))\leq D+R$, so the lower quasi-isometry bound gives
+\[
+  d(y,x)\leq D(D+R)+D^2<h,
+\]
+a contradiction.
 \end{proof}
 
 \begin{theorem}[Three rays]
@@ -80,8 +103,26 @@ quasi-isometric to $\mathrm{Ray}$.
 
 \begin{proof}
 \leanok
-Two rays out of a common vertex meeting nowhere else are at distance the sum of their
-parameters. A geodesic in $\mathrm{Ray}$ out of the image of the branch vertex runs along the
-ray, so of the three images two must head the same way; taking both far out, their preimages
-are far apart while their images are close, contradicting the lower bound of \cref{def:qi}.
+Suppose that $f$ is a $D$-quasi-isometry and set $\rho=2D^2+1$. For distinct rays $r_i$
+and $r_j$, uniqueness of paths in the source tree gives
+\[
+  d(r_i(m),r_j(n))=m+n.
+\]
+Among the three vertices $f(r_i(\rho))$ of $\mathrm{Ray}$, two lie on the same side of
+$f(v)$. After exchanging them if necessary, $f(r_i(\rho))$ lies between $f(v)$ and
+$f(r_j(\rho))$.
+
+Apply \cref{lem:stability} to the geodesic from $v$ to $r_j(\rho)$. It gives a vertex $y$
+on this geodesic such that
+$d(f(y),f(r_i(\rho)))\leq D$. The geodesic is the initial segment of $r_j$, so
+$y=r_j(t)$ for some $t\leq\rho$. The two rays meet only at $v$, and consequently
+\[
+  d(y,r_i(\rho))=t+\rho\geq\rho.
+\]
+The lower quasi-isometry bound gives the opposite estimate
+\[
+  d(y,r_i(\rho))\leq D\,d(f(y),f(r_i(\rho)))+D^2
+  \leq2D^2<\rho,
+\]
+which is the required contradiction.
 \end{proof}

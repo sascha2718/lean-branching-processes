@@ -33,9 +33,16 @@ and the value at $k=0$ is $f(q)=q$.
 
 \begin{proof}
 \leanok
-Splitting at the root turns the event that the root has $j$ children of which exactly those in
-a set $S$ survive into a product event, of mass $\theta_j(1-q)^{\abs{S}}q^{\,j-\abs{S}}$.
-Summing over the sets of size $k$ gives the binomial count.
+Condition on the root having $j$ children. For a fixed set $S$ of these children, the
+branching property identifies the event that precisely the children in $S$ survive with a
+product event for the $j$ shifted fields. Its probability is
+\[
+  \theta_j(1-q)^{\abs{S}}q^{\,j-\abs{S}}.
+\]
+The events obtained from distinct sets $S$ are disjoint. Summing over the
+$\binom{j}{k}$ sets of size $k$, and then over $j$, gives the stated formula. When $k=0$,
+the sum is $\sum_j\theta_jq^j=f(q)=q$ by
+\cref{lem:extinction-fixed}.
 \end{proof}
 
 \begin{definition}[The reduced and the conjugate law]
@@ -51,9 +58,22 @@ offspring laws with the same support bound.
 
 \begin{proof}
 \leanok
-The reduced weights sum to one by the binomial theorem at $(1-q)+q=1$ together with
-$\tilde\theta_0=q$ of \cref{lem:surviveWeight}; the conjugate weights sum to one because
-$f(q)=q$.
+All the displayed weights are nonnegative and vanish above $J$. To compute the total
+surviving-child weight, interchange the two finite sums and apply the binomial theorem:
+\[
+  \sum_{k=0}^{J}\sum_{j=k}^{J}
+  \theta_j\binom{j}{k}(1-q)^kq^{j-k}
+  =\sum_{j=0}^{J}\theta_j\sum_{k=0}^{j}
+  \binom{j}{k}(1-q)^kq^{j-k}
+  =\sum_{j=0}^{J}\theta_j((1-q)+q)^j=1.
+\]
+By \cref{lem:surviveWeight}, the term with $k=0$ is $q$. The terms with $k\geq1$
+therefore sum to $1-q$, and division by $1-q$ proves that the reduced weights sum to one.
+For the conjugate weights,
+\[
+  \sum_{j=0}^{J}\hat\theta_j=q^{-1}\sum_{j=0}^{J}\theta_jq^j
+  =q^{-1}f(q)=1.
+\]
 \end{proof}
 
 \section{The two halves}
@@ -69,13 +89,19 @@ law of the Galton--Watson tree of the reduced law.
 
 \begin{proof}
 \leanok
-Re-address the skeleton so that the $m$-th surviving child of a skeleton vertex is reached by
-the letter $m$. \Cref{lem:surviveWeight} gives the arity at the root; the branching property
-of \cref{lem:branching} makes each surviving subtree an independent copy of the conditioned
-process, so the arity at an arbitrary skeleton vertex is reduced-law distributed and
-independent of the address being present. The containment events of the finite prefix-closed
-sets of words form a $\pi$-system generating the $\sigma$-algebra on subtrees, and the two
-laws agree on it.
+Re-address the skeleton by giving the $m$-th surviving child of each skeleton vertex the
+letter $m$. Under the law conditioned on survival, \cref{lem:surviveWeight} shows that the
+number of children of the root has law $\tilde\theta$. Conditional on this number, the
+corresponding shifted fields are independent and each has the original law conditioned on
+survival.
+
+We apply this root identity recursively to a finite prefix-closed set $F$ of skeleton
+addresses. Induction on the maximal length of a word in $F$ gives the same probability for
+the containment event $\set{S\colon F\subseteq S}$ under the re-addressed skeleton law and
+the Galton--Watson law with offspring distribution $\tilde\theta$. Replacing a finite set
+of words by its prefix closure does not change this event for subtrees. These
+containment events form a $\pi$-system that generates the measurable space of subtrees, so
+uniqueness of probability measures proves the equality of laws.
 \end{proof}
 
 \begin{theorem}[The bushes are Galton--Watson trees]
@@ -89,9 +115,17 @@ tree of the conjugate law.
 
 \begin{proof}
 \leanok
-The same route with the dying subtrees constrained: conditioned on extinction the root has
-$j$ children with probability $\theta_jq^{\,j-1}$, and its subtrees are independent copies of
-the process conditioned to die.
+Conditioned on extinction, the root can have $j$ children only when all $j$ shifted
+subfields become extinct. The branching property and independence therefore give
+\[
+  \bbP^{\mathrm b}(c(\rt)=j)
+  =\frac{\theta_jq^j}{q}=\hat\theta_j.
+\]
+Conditional on this root count, the $j$ shifted fields are independent and each has law
+$\bbP^{\mathrm b}$. Recursing over a finite prefix-closed set of addresses shows that the
+bush law and the Galton--Watson law with offspring distribution $\hat\theta$ agree on every
+finite containment event. As in the proof of \cref{thm:harris-skeleton}, these events
+generate the measurable space of subtrees, which proves the equality of laws.
 \end{proof}
 
 \section{The joint form}
@@ -124,8 +158,19 @@ each dying subtree entering through the Galton--Watson law of the conjugate law.
 
 \begin{proof}
 \leanok
-The joint root step constrains the surviving and the dying subtrees of one vertex at once,
-through a product event over the blocks of the splitting. Decomposing a prefix-closed finite
-set of addresses at the root and iterating that step down the skeleton gives the product, and
-\cref{thm:harris-bushes} turns each bush factor into the conjugate tree law.
+We first prove the factorisation at the root. Fix the root offspring count $j$ and the set
+$S$ of its $k$ surviving children. Splitting the field at the root gives independent blocks:
+the root count has mass $\theta_j$, the fields indexed by $S$ have law $\bbP^{\mathrm s}$,
+and the remaining fields have law $\bbP^{\mathrm b}$. Summing over the
+$\binom{j}{k}$ possible sets $S$ and dividing by the survival probability $1-q$ gives the
+root decoration weight in the statement.
+
+We now induct on the maximal length of an address in $F$. Since $F$ is prefix-closed, it
+decomposes into the root and, for each child address occurring in $F$, a prefix-closed set
+of suffixes. The compatibility assumption ensures that these children are among the first
+$k_{\rt}$ surviving children. Apply the root factorisation, then apply the induction
+hypothesis independently inside each of the corresponding surviving subfields. The
+resulting products combine to give one decoration factor for every $u\in F$. Finally,
+\cref{thm:harris-bushes} identifies the law of each dying subtree with the Galton--Watson
+law of $\hat\theta$, yielding the displayed formula.
 \end{proof}

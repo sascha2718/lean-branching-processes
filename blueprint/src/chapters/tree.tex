@@ -29,7 +29,11 @@ is a prefix of $v\wedge w$.
 
 \begin{proof}
 \leanok
-Induction on the two words, comparing the leading letters.
+We first prove that $v\wedge w$ is a prefix of $v$ by induction on $v$, splitting according
+to whether $w$ is empty and, when both words are nonempty, whether their first letters
+agree. The corresponding assertion for $w$ follows by symmetry. For maximality, we induct
+on a common prefix $u$. If $u$ is nonempty, the prefix assumptions force $v$ and $w$ to have
+the same first letter as $u$, and the claim reduces to their tails.
 \end{proof}
 
 \begin{lemma}[The metric]
@@ -44,9 +48,22 @@ satisfies the triangle inequality. A vertex and one of its children are at dista
 
 \begin{proof}
 \leanok
-The wedge is a prefix of both words, so $2\abs{v\wedge w}\leq\abs{v}+\abs{w}$, which is the
-first claim. The triangle inequality follows from the observation that of the three wedges
-$v\wedge w$, $w\wedge u$ and $v\wedge u$, two are equal and the third is at least as long.
+Since $v\wedge w$ is a prefix of both words, its length is bounded by each of
+$\abs{v}$ and $\abs{w}$. Thus
+$2\abs{v\wedge w}\leq\abs{v}+\abs{w}$, so the subtraction in the definition of $d$ does
+not truncate. If $d(v,w)=0$, these two length bounds are equalities. A prefix of the same
+length as a word is the word itself, which gives $v=v\wedge w=w$.
+
+For the triangle inequality, compare the two prefixes $u\wedge v$ and $v\wedge w$ of $v$.
+One is a prefix of the other, and the shorter one is consequently a common prefix of $u$
+and $w$. Hence
+\[
+  \abs{u\wedge v}+\abs{v\wedge w}
+  \leq \abs{v}+\abs{u\wedge w}.
+\]
+Substituting this bound into the three distance formulae gives
+$d(u,w)\leq d(u,v)+d(v,w)$. Finally, if $w$ is a child of $v$, then $v$ is a prefix of $w$
+and $\abs{w}=\abs{v}+1$, so $d(v,w)=1$.
 \end{proof}
 
 \begin{definition}[Subtrees]

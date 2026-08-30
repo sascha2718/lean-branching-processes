@@ -15,8 +15,16 @@ weight along $T$ is at least $p$.
 
 \begin{proof}
 \leanok
-The event is a cylinder over the vertices of $T$, and the field being independent, its mass is
-the product of the offspring weights along the tree.
+Choose a field $e$ with sample $T$. We first show, by induction on the length of a word,
+that any field $c$ satisfying $c(v)=e(v)$ for every $v\in T$ has the same sample as $e$.
+Indeed, membership of a child $vj$ is determined by membership of $v$ and the single
+inequality $j<c(v)$, so the induction never uses a coordinate outside $T$.
+
+Since $T$ is finite, agreement with $e$ on $T$ is a finite cylinder event. Independence
+of the coordinate field gives it mass
+$\prod_{v\in T}\theta_{e(v)}$. This cylinder is contained in the event that the sample is
+$T$. If every factor is at least $p$, its mass is at least $p^{\abs{T}}$, which proves the
+point-mass bound.
 \end{proof}
 
 \begin{definition}[Truncated progeny]
@@ -39,9 +47,24 @@ $y>1$ with $s f(y)=y$ bounds every $F_k(s)$.
 
 \begin{proof}
 \leanok
-The one-step event, read through the splitting at the root, is a product over the children;
-the extra factor $s$ counts the root. The bound follows by induction, monotonicity of $f$
-giving $F_k(s)\leq y \Rightarrow F_{k+1}(s)=s f(F_k(s))\leq s f(y)=y$.
+The truncations satisfy the deterministic recursion
+\[
+  Z_{k+1}(c)=1+\sum_{i<c(\rt)}Z_k(c_i),
+\]
+where $c_i(w)=c(iw)$ is the field below the $i$-th child. On the event
+$c(\rt)=j$, the $j$ fields $c_i$ are independent copies of the original field. Therefore
+\[
+  \bbE\bigl[s^{Z_{k+1}}\,\mathbf1_{\set{c(\rt)=j}}\bigr]
+  =s\theta_jF_k(s)^j.
+\]
+Summing over $j$ gives $F_{k+1}(s)=s f(F_k(s))$.
+
+Since $Z_0=0$, we have $F_0(s)=1\leq y$. If $F_k(s)\leq y$, monotonicity of $f$ on the
+nonnegative half-line gives
+\[
+  F_{k+1}(s)=s f(F_k(s))\leq s f(y)=y.
+\]
+Induction proves the uniform bound.
 \end{proof}
 
 \begin{lemma}[The progeny equation has a solution]
@@ -55,8 +78,15 @@ For a subcritical law there are $s,y>1$ with $s f(y)=y$.
 
 \begin{proof}
 \leanok
-A subcritical generating function drops below the diagonal just above one, since $f'(1)=m<1$.
-Picking $y>1$ there with $f(y)<y$ and setting $s=y/f(y)>1$ solves the equation.
+Use the factorisation from the proof of \cref{thm:supercritical},
+\[
+  1-f(t)=(1-t)g(t),
+  \qquad g(1)=m<1.
+\]
+Continuity of $g$ gives $y>1$ sufficiently close to $1$ that $g(y)<1$. Since $1-y<0$,
+the factorisation implies $f(y)<y$. On the other hand, monotonicity and $y>1$ give
+$f(y)\geq f(1)=1$. Thus $s=y/f(y)$ is well defined and satisfies $s>1$ and
+$s f(y)=y$.
 \end{proof}
 
 \begin{theorem}[Exponential moment of the total progeny]
@@ -72,9 +102,23 @@ conjugate law is subcritical.
 
 \begin{proof}
 \leanok
-\Cref{lem:progeny-fixed} supplies $\sigma,y>1$ with $\sigma f(y)=y$, and
-\cref{lem:progeny-recursion} bounds every truncated moment by $y$. The truncations increase to
-$\sigma^{\abs{\cT}}$, so monotone convergence transfers the bound. The statement for bushes is
-the same computation under $\bbP^{\mathrm{b}}$, transported along
-\cref{thm:harris-bushes}.
+By \cref{lem:progeny-fixed}, choose $\sigma,y>1$ such that $\sigma f(y)=y$.
+Then \cref{lem:progeny-recursion} gives
+\[
+  \bbE\bigl[\sigma^{Z_k}\bigr]\leq y
+  \qquad\text{for every }k.
+\]
+The variables $Z_k$ increase with $k$. If the sample is finite, then $Z_k=\abs{\cT}$ for
+all sufficiently large $k$, and hence
+$\sigma^{\abs{\cT}}\leq\sup_k\sigma^{Z_k}$. If the sample is infinite, the same inequality
+holds with Mathlib's convention that the finite cardinality of an infinite set is zero.
+The monotone convergence theorem therefore gives
+\[
+  \bbE\bigl[\sigma^{\abs{\cT}}\bigr]
+  \leq \sup_k\bbE\bigl[\sigma^{Z_k}\bigr]
+  \leq y<\infty.
+\]
+For the bush law, apply the same result to the subcritical conjugate law and use
+\cref{thm:harris-bushes} to identify the resulting Galton--Watson tree law with the law of
+a bush.
 \end{proof}
