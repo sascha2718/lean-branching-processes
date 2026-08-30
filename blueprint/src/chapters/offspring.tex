@@ -1,0 +1,92 @@
+\chapter{Offspring laws and extinction}
+\label{ch:offspring}
+
+\begin{definition}[Offspring law]
+\label{def:offspring}
+\lean{BranchingProcess.Offspring, BranchingProcess.Offspring.mean}
+\leanok
+An \emph{offspring law} with support bound $J$ is a sequence $\theta=(\theta_j)_{j\geq0}$ of
+nonnegative reals vanishing above $J$ and summing to one. Its \emph{mean} is
+$m=\sum_j j\,\theta_j$, and $\theta$ is \emph{subcritical}, \emph{critical} or
+\emph{supercritical} according as $m<1$, $m=1$ or $m>1$.
+\end{definition}
+
+\begin{definition}[Generating function]
+\label{def:gen}
+\uses{def:offspring}
+\lean{BranchingProcess.Offspring.gen, BranchingProcess.Offspring.genDeriv}
+\leanok
+The generating function of $\theta$ is $f(s)=\sum_{j=0}^{J}\theta_j s^j$.
+\end{definition}
+
+\begin{lemma}[Elementary properties of $f$]
+\label{lem:gen}
+\uses{def:gen}
+\lean{BranchingProcess.Offspring.gen_one, BranchingProcess.Offspring.gen_le_one,
+BranchingProcess.Offspring.gen_mono, BranchingProcess.Offspring.hasDerivAt_gen,
+BranchingProcess.Offspring.genDeriv_one}
+\leanok
+$f(1)=1$, $f(0)=\theta_0$, $f$ maps $[0,1]$ into itself monotonically, and $f'(1)=m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each is a termwise computation on the finite sum.
+\end{proof}
+
+\begin{definition}[Extinction probability]
+\label{def:extinction}
+\uses{def:gen}
+\lean{BranchingProcess.Offspring.extinction}
+\leanok
+The \emph{extinction probability} of $\theta$ is
+\[
+  q=\inf\set{s\in[0,1] : f(s)=s},
+\]
+the least fixed point of $f$ in $[0,1]$.
+\end{definition}
+
+\begin{lemma}[The infimum is a fixed point]
+\label{lem:extinction-fixed}
+\uses{def:extinction}
+\lean{BranchingProcess.Offspring.extinction_mem, BranchingProcess.Offspring.gen_extinction,
+BranchingProcess.Offspring.extinction_le_of_fixed}
+\leanok
+$q\in[0,1]$, $f(q)=q$, and $q\leq s$ for every fixed point $s\in[0,1]$ of $f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The fixed-point set is closed, nonempty because $f(1)=1$, and bounded below by $0$, so it
+contains its infimum. Minimality is the defining property of the infimum.
+\end{proof}
+
+\begin{lemma}[Extinction and childlessness]
+\label{lem:extinction-zero}
+\uses{lem:extinction-fixed}
+\lean{BranchingProcess.Offspring.extinction_eq_zero_iff, BranchingProcess.Offspring.extinction_pos}
+\leanok
+$q=0$ if and only if $\theta_0=0$; in particular $\theta_0>0$ forces $q>0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $q=0$ then $\theta_0=f(0)=f(q)=q=0$. Conversely $\theta_0=0$ makes $0$ a fixed point, and
+minimality gives $q\leq0$.
+\end{proof}
+
+\begin{theorem}[A supercritical law survives]
+\label{thm:supercritical}
+\uses{lem:extinction-fixed, lem:gen}
+\lean{BranchingProcess.Offspring.extinction_lt_one_of_supercritical}
+\leanok
+If $m>1$ then $q<1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $1-f(s)=(1-s)g(s)$ with $g(s)=\sum_j\theta_j(1+s+\dots+s^{j-1})$, a polynomial with
+$g(1)=m>1$. By continuity $g>1$ on a left neighbourhood of $1$, so $f(s)<s$ for some $s<1$.
+Since $f(0)=\theta_0\geq0$, the intermediate value theorem produces a fixed point in $[0,s]$,
+and minimality pushes $q$ below it.
+\end{proof}

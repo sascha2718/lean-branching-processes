@@ -1,14 +1,22 @@
 # BranchingProcess
 
 A Lean 4 formalisation of Galton-Watson branching processes over an `N`-ary alphabet,
-built on Mathlib alone. Mathlib has no branching-process layer; this library supplies
+built on Mathlib alone.
+
+- [Blueprint and dependency graph](https://sascha2718.github.io/lean-branching-processes/)
+- [Printable blueprint](https://sascha2718.github.io/lean-branching-processes/blueprint.pdf)
+- [Generated API documentation](https://sascha2718.github.io/lean-branching-processes/docs/)
+ Mathlib has no branching-process layer; this library supplies
 offspring laws and their extinction probability, the genealogical tree cut out by a
 field of offspring counts, the law of that tree as a measure on subtrees, and the
 Harris-Sevastyanov decomposition of a supercritical sample into its surviving skeleton
 and the finite bushes hanging off it.
 
-The library is sorry-free. `BranchingProcess/AxCheck.lean` audits 94 endpoints, each
-reporting `propext`, `Classical.choice`, `Quot.sound` or a subset of them.
+The library is sorry-free and carries two independent audits.
+`BranchingProcess/AxCheck.lean` reports the axioms of 94 endpoints, each
+`propext`, `Classical.choice`, `Quot.sound` or a subset of them. `Challenge.lean` restates
+the seven headline theorems over Mathlib alone and `Solution.lean` discharges them from the
+library, which the comparator checks at the level of the exported kernel environments.
 
 ## Layout
 
@@ -58,6 +66,62 @@ lake build
 endpoint. The root module does not import `AxCheck`, so a downstream project that says
 `import BranchingProcess` never compiles the audit; `lake build BranchingProcess.AxCheck`
 runs it on its own.
+
+### The comparator audit
+
+`Challenge.lean` states the seven headline theorems using Mathlib alone: every notion they
+mention, from the offspring law to the measurable structure on subtrees, is defined in that
+file, and no module of the library is imported. `Solution.lean` repeats those definitions and
+proves each theorem from the library. Build them with
+
+```bash
+lake build Challenge Solution
+```
+
+and run the kernel-level audit with
+
+```bash
+./comparator-audit.sh
+```
+
+The audited names are listed in `comparator-config.json`. The script needs local builds of
+[comparator](https://github.com/leanprover/comparator) and
+[lean4export](https://github.com/leanprover/lean4export) at Lean `v4.32.2`; set
+`COMPARATOR_TOOLS` to the directory holding them. `landrun` is Linux-only, so on macOS the
+comparator's shim runs the builds unsandboxed.
+
+Two statements carry the reduced and the conjugate law as a hypothesis, `θ'` with
+`∀ k, θ' k = θ.skeletonWeight k`, rather than a bundled offspring law built in the challenge
+file. Bundling needs the weights to sum to one, which is a binomial identity; carrying the law
+as a hypothesis keeps that proof out of the trusted file and states the same mathematics.
+
+### The blueprint
+
+The printable and web sources are in `blueprint/src`. A local PDF build needs XeLaTeX and
+`latexmk`:
+
+```bash
+cd blueprint/src
+latexmk
+```
+
+To build the web version, install `leanblueprint`, `plasTeX`, `plastexdepgraph` and
+`plastexshowmore`, then run:
+
+```bash
+cd blueprint/src
+plastex -c plastex.cfg web.tex
+```
+
+The web entry point is written to `blueprint/web/index.html`.
+
+### Continuous integration
+
+`.github/workflows/build.yml` builds the library with its axiom check and then runs the
+comparator audit. `.github/workflows/blueprint.yml` builds the blueprint and the API
+documentation and deploys the combined site to GitHub Pages. Both trigger on pushes to `main`.
+The site URLs are set by `\home`, `\github` and `\dochome` in `blueprint/src/web.tex`, and
+repeated at the top of this file.
 
 On a machine that already holds a built Mathlib at that revision, point `.lake/packages`
 at it instead of fetching a second copy:

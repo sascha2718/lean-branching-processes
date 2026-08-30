@@ -6,8 +6,18 @@ name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
 rev = "v4.32.2"
 
-# `BranchingProcess.AxCheck` is covered by the glob, so `lake build` runs it, but it
-# is not imported by the root module: `import BranchingProcess` does not drag it in.
+# The glob covers the root module and every submodule, so `lake build` also runs
+# `BranchingProcess.AxCheck`. The root module does not import `AxCheck`, so
+# `import BranchingProcess` does not drag the audit in.
 [[lean_lib]]
 name = "BranchingProcess"
-globs = ["BranchingProcess.+"]
+globs = ["BranchingProcess", "BranchingProcess.*"]
+
+# Comparator audit modules, not part of the library and not default targets:
+# `Challenge` restates the headline theorems with `sorry`, `Solution` proves them
+# by the library declarations. See comparator-config.json.
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

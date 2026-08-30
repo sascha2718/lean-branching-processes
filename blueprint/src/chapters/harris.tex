@@ -1,0 +1,131 @@
+\chapter{The Harris decomposition}
+\label{ch:harris}
+
+Conditioned on survival, the skeleton of a Galton--Watson tree is again a Galton--Watson
+tree, for a reduced law, and the subtrees hanging off it are independent Galton--Watson trees
+for a conjugate law. This chapter proves both halves and then their joint form.
+
+\section{Conditioning at the root}
+
+\begin{definition}[The conditioned laws]
+\label{def:conditioned}
+\uses{def:sampleMeasure}
+\lean{BranchingProcess.survivalMeasure, BranchingProcess.bushMeasure,
+BranchingProcess.skeletonDegree}
+\leanok
+Write $\bbP^{\mathrm{s}}$ for the field measure conditioned on survival and
+$\bbP^{\mathrm{b}}$ for it conditioned on extinction. The \emph{skeleton degree} of a field
+is the number of children of the root founding an infinite subtree.
+\end{definition}
+
+\begin{lemma}[The surviving-children count]
+\label{lem:surviveWeight}
+\uses{def:conditioned}
+\lean{BranchingProcess.Offspring.surviveWeight, BranchingProcess.sampleMeasure_skeletonDegree,
+BranchingProcess.Offspring.surviveWeight_zero}
+\leanok
+Unconditionally, the root has exactly $k$ surviving children with probability
+\[
+  \sum_{j}\theta_j\binom{j}{k}(1-q)^{k}q^{\,j-k},
+\]
+and the value at $k=0$ is $f(q)=q$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Splitting at the root turns the event that the root has $j$ children of which exactly those in
+a set $S$ survive into a product event, of mass $\theta_j(1-q)^{\abs{S}}q^{\,j-\abs{S}}$.
+Summing over the sets of size $k$ gives the binomial count.
+\end{proof}
+
+\begin{definition}[The reduced and the conjugate law]
+\label{def:reduced}
+\uses{lem:surviveWeight, lem:extinction-zero}
+\lean{BranchingProcess.Offspring.reduced, BranchingProcess.Offspring.conjugate}
+\leanok
+The \emph{reduced law} is the Harris--Sevastyanov transform
+$\tilde\theta_k=\bigl(\sum_j\theta_j\binom{j}{k}(1-q)^kq^{\,j-k}\bigr)/(1-q)$ for $k\geq1$ and
+$\tilde\theta_0=0$; the \emph{conjugate law} is $\hat\theta_j=\theta_jq^{\,j}/q$. Both are
+offspring laws with the same support bound.
+\end{definition}
+
+\begin{proof}
+\leanok
+The reduced weights sum to one by the binomial theorem at $(1-q)+q=1$ together with
+$\tilde\theta_0=q$ of \cref{lem:surviveWeight}; the conjugate weights sum to one because
+$f(q)=q$.
+\end{proof}
+
+\section{The two halves}
+
+\begin{theorem}[The skeleton is a Galton--Watson tree]
+\label{thm:harris-skeleton}
+\uses{def:reduced, def:sampleMeasure}
+\lean{BranchingProcess.skeletonTreeLaw_eq_treeLaw}
+\leanok
+If $J\leq N$ and $q<1$, the re-addressed skeleton of a sample conditioned on survival has the
+law of the Galton--Watson tree of the reduced law.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Re-address the skeleton so that the $m$-th surviving child of a skeleton vertex is reached by
+the letter $m$. \Cref{lem:surviveWeight} gives the arity at the root; the branching property
+of \cref{lem:branching} makes each surviving subtree an independent copy of the conditioned
+process, so the arity at an arbitrary skeleton vertex is reduced-law distributed and
+independent of the address being present. The containment events of the finite prefix-closed
+sets of words form a $\pi$-system generating the $\sigma$-algebra on subtrees, and the two
+laws agree on it.
+\end{proof}
+
+\begin{theorem}[The bushes are Galton--Watson trees]
+\label{thm:harris-bushes}
+\uses{def:reduced, def:sampleMeasure}
+\lean{BranchingProcess.bushTreeLaw_eq_treeLaw}
+\leanok
+If $J\leq N$ and $q>0$, a sample conditioned on extinction has the law of the Galton--Watson
+tree of the conjugate law.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The same route with the dying subtrees constrained: conditioned on extinction the root has
+$j$ children with probability $\theta_jq^{\,j-1}$, and its subtrees are independent copies of
+the process conditioned to die.
+\end{proof}
+
+\section{The joint form}
+
+\begin{definition}[The decoration of a skeleton vertex]
+\label{def:decoration}
+\uses{thm:harris-skeleton, thm:harris-bushes}
+\lean{BranchingProcess.decorationEvent, BranchingProcess.decorationMass}
+\leanok
+The \emph{decoration} of a skeleton vertex is its offspring count $j$, its number $k$ of
+surviving children, and its dying subtrees indexed by rank.
+\end{definition}
+
+\begin{theorem}[The joint Harris decomposition]
+\label{thm:harris-joint}
+\uses{def:decoration}
+\lean{BranchingProcess.survivalMeasure_decorations,
+BranchingProcess.survivalMeasure_decorations_treeLaw}
+\leanok
+Conditioned on survival, probe the skeleton on a finite prefix-closed set $F$ of addresses and
+constrain the decoration of each probed vertex. The mass factorises into one weight per
+vertex,
+\[
+  \prod_{u\in F}
+  \frac{\theta_{j_u}\binom{j_u}{k_u}(1-q)^{k_u}q^{\,j_u-k_u}}{1-q}
+  \prod_{m<j_u-k_u}\bbP_{\hat\theta}(\cT\in\mathcal{A}_{u,m}),
+\]
+each dying subtree entering through the Galton--Watson law of the conjugate law.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The joint root step constrains the surviving and the dying subtrees of one vertex at once,
+through a product event over the blocks of the splitting. Decomposing a prefix-closed finite
+set of addresses at the root and iterating that step down the skeleton gives the product, and
+\cref{thm:harris-bushes} turns each bush factor into the conjugate tree law.
+\end{proof}

@@ -1,0 +1,26 @@
+% The printable version of the blueprint.
+
+\documentclass[a4paper]{report}
+
+\usepackage{geometry}
+
+\usepackage{expl3}
+
+\usepackage{amssymb, amsthm, mathtools}
+\usepackage{aliascnt}
+\usepackage[unicode,colorlinks=true,linkcolor=blue,urlcolor=magenta, citecolor=blue]{hyperref}
+\usepackage[capitalize,noabbrev,nameinlink]{cleveref}
+
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\input{macros/common}
+\input{macros/print}
+
+\title{Galton--Watson branching processes in Lean}
+\author{Sascha Troscheit}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\input{content}
+\end{document}

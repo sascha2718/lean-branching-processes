@@ -1,0 +1,80 @@
+\chapter{Finite trees and the total progeny}
+\label{ch:progeny}
+
+\begin{lemma}[The point mass of a finite tree]
+\label{lem:point-mass}
+\uses{def:sampleMeasure}
+\lean{BranchingProcess.sampleMeasure_agreeOn,
+BranchingProcess.ofReal_pow_le_sampleMeasure_sample_eq}
+\leanok
+Two fields agreeing at the vertices of one of their samples cut out the same tree. Hence the
+probability that the sample is a prescribed finite tree $T$ is
+$\prod_{v\in T}\theta_{c(v)}$, and it is at least $p^{\abs{T}}$ whenever every offspring
+weight along $T$ is at least $p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The event is a cylinder over the vertices of $T$, and the field being independent, its mass is
+the product of the offspring weights along the tree.
+\end{proof}
+
+\begin{definition}[Truncated progeny]
+\label{def:progeny}
+\uses{def:sample}
+\lean{BranchingProcess.progeny, BranchingProcess.progenyTree}
+\leanok
+The \emph{truncated progeny} $Z_k$ is the number of vertices of the sample within the first
+$k$ generations.
+\end{definition}
+
+\begin{lemma}[The progeny recursion]
+\label{lem:progeny-recursion}
+\uses{def:progeny, lem:branching}
+\lean{BranchingProcess.lintegral_pow_progeny_succ, BranchingProcess.lintegral_pow_progeny_le}
+\leanok
+Writing $F_k(s)=\bbE\bigl[s^{Z_k}\bigr]$, one has $F_{k+1}(s)=s\,f(F_k(s))$, and any
+$y>1$ with $s f(y)=y$ bounds every $F_k(s)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The one-step event, read through the splitting at the root, is a product over the children;
+the extra factor $s$ counts the root. The bound follows by induction, monotonicity of $f$
+giving $F_k(s)\leq y \Rightarrow F_{k+1}(s)=s f(F_k(s))\leq s f(y)=y$.
+\end{proof}
+
+\begin{lemma}[The progeny equation has a solution]
+\label{lem:progeny-fixed}
+\uses{lem:gen, def:offspring}
+\lean{BranchingProcess.Offspring.exists_gen_lt_self,
+BranchingProcess.Offspring.exists_progeny_fixedPoint}
+\leanok
+For a subcritical law there are $s,y>1$ with $s f(y)=y$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A subcritical generating function drops below the diagonal just above one, since $f'(1)=m<1$.
+Picking $y>1$ there with $f(y)<y$ and setting $s=y/f(y)>1$ solves the equation.
+\end{proof}
+
+\begin{theorem}[Exponential moment of the total progeny]
+\label{thm:progeny-moment}
+\uses{lem:progeny-recursion, lem:progeny-fixed}
+\lean{BranchingProcess.exists_exponential_moment,
+BranchingProcess.exists_exponential_moment_bushMeasure}
+\leanok
+For a subcritical offspring law there is $\sigma>1$ with
+$\bbE\bigl[\sigma^{\abs{\cT}}\bigr]<\infty$. The same holds for the size of a bush once the
+conjugate law is subcritical.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:progeny-fixed} supplies $\sigma,y>1$ with $\sigma f(y)=y$, and
+\cref{lem:progeny-recursion} bounds every truncated moment by $y$. The truncations increase to
+$\sigma^{\abs{\cT}}$, so monotone convergence transfers the bound. The statement for bushes is
+the same computation under $\bbP^{\mathrm{b}}$, transported along
+\cref{thm:harris-bushes}.
+\end{proof}

@@ -1,0 +1,60 @@
+\chapter{The ambient tree}
+\label{ch:tree}
+
+The genealogy of a branching process is carried inside a fixed ambient tree, whose vertices
+are words. Nothing in this chapter is probabilistic.
+
+\begin{definition}[The ambient $N$-ary tree]
+\label{def:word}
+\lean{BranchingProcess.Word, BranchingProcess.wedge, BranchingProcess.treeDist}
+\leanok
+Fix $N\in\bbN$. A vertex of the ambient tree $\cN(N)$ is a finite word over the alphabet
+$\{0,\dots,N-1\}$; the root is the empty word $\rt$ and the children of $v$ are the words
+$v j$ with $j<N$. The \emph{wedge} $v\wedge w$ of two vertices is their longest common
+prefix, and the graph metric of $\cN(N)$ is
+\[
+  d(v,w)=\abs{v}+\abs{w}-2\abs{v\wedge w}.
+\]
+\end{definition}
+
+\begin{lemma}[The wedge is the greatest common prefix]
+\label{lem:wedge}
+\uses{def:word}
+\lean{BranchingProcess.wedge_prefix_left, BranchingProcess.wedge_prefix_right,
+BranchingProcess.prefix_wedge_of_prefix}
+\leanok
+The wedge $v\wedge w$ is a prefix of both $v$ and $w$, and every common prefix of $v$ and $w$
+is a prefix of $v\wedge w$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on the two words, comparing the leading letters.
+\end{proof}
+
+\begin{lemma}[The metric]
+\label{lem:treeDist}
+\uses{def:word, lem:wedge}
+\lean{BranchingProcess.treeDist_add, BranchingProcess.treeDist_eq_zero_iff,
+BranchingProcess.treeDist_triangle}
+\leanok
+The subtraction defining $d$ does not truncate, $d(v,w)=0$ exactly when $v=w$, and $d$
+satisfies the triangle inequality. A vertex and one of its children are at distance one.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The wedge is a prefix of both words, so $2\abs{v\wedge w}\leq\abs{v}+\abs{w}$, which is the
+first claim. The triangle inequality follows from the observation that of the three wedges
+$v\wedge w$, $w\wedge u$ and $v\wedge u$, two are equal and the third is at least as long.
+\end{proof}
+
+\begin{definition}[Subtrees]
+\label{def:subtree}
+\uses{def:word}
+\lean{BranchingProcess.Subtree}
+\leanok
+A \emph{subtree} of $\cN(N)$ is a prefix-closed set of words, taken as a term of Mathlib's
+\texttt{Descriptive.tree}. The residual subtree of $T$ at $v$ is
+$T_v=\set{w : vw\in T}$.
+\end{definition}

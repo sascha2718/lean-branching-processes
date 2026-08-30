@@ -1,0 +1,186 @@
+name: Blueprint
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Pages runs one deployment at a time, and a queued one is worth finishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  blueprint:
+    name: Build the blueprint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # blueprint.sty ships in blueprint/src, so TeX Live supplies nothing
+      # beyond its standard packages. plasTeX and its two plugins are pinned to
+      # the versions the site was written against. The image is the Debian one:
+      # pygraphviz publishes manylinux wheels only, so on the Alpine image it is
+      # built from source, and that link step wants graphviz plugin libraries
+      # which Alpine graphviz-dev does not carry. Debian trixie already provides
+      # graphviz and python3, leaving the virtual environment to install.
+      - name: Build the pdf and the web version
+        uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          texlive_version: 2025
+          os: debian
+          run: |
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y --no-install-recommends python3-venv
+            python3 -m venv /tmp/venv
+            . /tmp/venv/bin/activate
+            pip install --upgrade pip
+            pip install pygraphviz==2.0.1
+            pip install plasTeX==3.1 plastexdepgraph==0.0.5 plastexshowmore==0.0.2 leanblueprint==0.0.20
+            cd blueprint/src
+            mkdir -p ../print
+            latexmk -output-directory=../print -interaction=nonstopmode -halt-on-error
+            plastex -c plastex.cfg web.tex
+
+      # \home in blueprint/src/web.tex names the site root, so the web version
+      # is the site itself and the printable version sits beside it.
+      - name: Assemble the blueprint
+        run: |
+          mkdir site
+          cp -r blueprint/web/. site/
+          cp blueprint/print/print.pdf site/blueprint.pdf
+
+      - name: Upload the blueprint
+        uses: actions/upload-artifact@v7
+        with:
+          name: blueprint
+          path: site
+          retention-days: 1
+
+  docs:
+    name: Build the api documentation
+    needs: blueprint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: project
+
+      # The key is the one `Build and audit` writes; this job only reads it.
+      - name: Restore the library build output
+        uses: actions/cache/restore@v4
+        with:
+          path: project/.lake/build
+          key: lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-${{ hashFiles('project/**/*.lean') }}
+          restore-keys: |
+            lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-
+
+      - name: Build
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: project
+          build: true
+          lint: false
+          mk_all-check: false
+
+      # The documentation of the dependencies is the expensive part of the doc
+      # build and it changes only with the manifest, so it alone is cached.
+      - name: Cache the documentation of the dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            project/docbuild/.lake/build/doc/Mathlib
+            project/docbuild/.lake/build/doc/Archive
+            project/docbuild/.lake/build/doc/Counterexamples
+            project/docbuild/.lake/build/doc/Aesop
+            project/docbuild/.lake/build/doc/Batteries
+            project/docbuild/.lake/build/doc/Cli
+            project/docbuild/.lake/build/doc/ImportGraph
+            project/docbuild/.lake/build/doc/LeanSearchClient
+            project/docbuild/.lake/build/doc/Plausible
+            project/docbuild/.lake/build/doc/ProofWidgets
+            project/docbuild/.lake/build/doc/Qq
+            project/docbuild/.lake/build/doc/Init
+            project/docbuild/.lake/build/doc/Lake
+            project/docbuild/.lake/build/doc/Lean
+            project/docbuild/.lake/build/doc/Std
+          key: docs-${{ hashFiles('project/lake-manifest.json') }}
+
+      # doc-gen4 is required by a throwaway package created here on the runner,
+      # which reaches the library through a path dependency and shares its
+      # packages directory. The project's own lakefile and manifest are left
+      # untouched, so nothing about this build has to be carried in the tree.
+      # doc-gen4 tags a release per toolchain, hence the tag read from
+      # lean-toolchain.
+      - name: Build the documentation
+        working-directory: project
+        run: |
+          mkdir -p docbuild
+          cat > docbuild/lakefile.toml <<TOML
+          name = "docbuild"
+          reservoir = false
+          version = "0.1.0"
+          packagesDir = "../.lake/packages"
+
+          [[require]]
+          name = "branchingprocess"
+          path = "../"
+
+          [[require]]
+          scope = "leanprover"
+          name = "doc-gen4"
+          rev = "$(cut -d: -f2 lean-toolchain)"
+          TOML
+          cd docbuild
+          MATHLIB_NO_CACHE_ON_UPDATE=1 lake update branchingprocess
+          lake build BranchingProcess:docs
+
+      - name: Download the blueprint
+        uses: actions/download-artifact@v8
+        with:
+          name: blueprint
+          path: site
+
+      # \dochome in blueprint/src/web.tex names this directory, so the links the
+      # blueprint carries to declarations resolve inside the published site.
+      - name: Assemble the site
+        run: |
+          mkdir -p site/docs
+          cp -r project/docbuild/.lake/build/doc/. site/docs/
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to Pages
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

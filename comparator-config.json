@@ -1,0 +1,20 @@
+{
+    "challenge_module": "Challenge",
+    "solution_module": "Solution",
+    "theorem_names": [
+        "Challenge.audit_sample_extinction",
+        "Challenge.audit_skeleton_tree_law",
+        "Challenge.audit_bush_tree_law",
+        "Challenge.audit_harris_decorations",
+        "Challenge.audit_progeny_exponential_moment",
+        "Challenge.audit_hair_line_separation",
+        "Challenge.audit_three_rays"
+    ],
+    "definition_names": [],
+    "permitted_axioms": [
+        "propext",
+        "Quot.sound",
+        "Classical.choice"
+    ],
+    "enable_nanoda": false
+}

@@ -1,0 +1,87 @@
+\chapter{Coarse geometry of trees}
+\label{ch:geometry}
+
+The two obstructions below are deterministic statements about arbitrary infinite trees. They
+are proved over Mathlib's \texttt{SimpleGraph} in its graph metric, and no hyperbolicity
+enters.
+
+\begin{definition}[Quasi-isometry]
+\label{def:qi}
+\lean{BranchingProcess.IsQIWith, BranchingProcess.QuasiIsometric}
+\leanok
+A map $f\colon V\to V'$ is a \emph{$D$-quasi-isometry} from $G$ to $G'$ when
+\[
+  d'(f x,f y)\leq D\,d(x,y)+D,
+  \qquad
+  d(x,y)\leq D\,d'(f x,f y)+D^2,
+\]
+for all $x,y$, and every vertex of $G'$ lies within $D$ of the image. Two graphs are
+\emph{quasi-isometric} when such a map exists for some $D$.
+\end{definition}
+
+\begin{definition}[Betweenness, rays, lines and hairs]
+\label{def:between}
+\lean{BranchingProcess.Between, BranchingProcess.IsRay, BranchingProcess.IsLine,
+BranchingProcess.IsHair, BranchingProcess.rayGraph}
+\leanok
+A vertex $m$ lies \emph{between} $u$ and $v$ when every walk from $u$ to $v$ meets $m$. A
+\emph{ray} is a map $\bbN\to V$ isometric onto its image and a \emph{line} is such a map
+$\bbZ\to V$. A \emph{hair} at $c$ of depth $h$ is a component $P$ of the complement of
+$\set{c}$ with $d(v,c)\leq h$ for every $v\in P$ and equality for some $v$. Finally
+$\mathrm{Ray}$ is $\bbN$ with the path-graph structure.
+\end{definition}
+
+\begin{lemma}[Quasi-geodesic stability in a tree]
+\label{lem:stability}
+\uses{def:qi, def:between}
+\lean{BranchingProcess.between_of_mem_support, BranchingProcess.between_iff_dist_add,
+BranchingProcess.exists_between_dist_le}
+\leanok
+Let $f$ be a $D$-quasi-isometry between trees. Every vertex separating $f(u)$ from $f(v)$ lies
+within $D$ of the image of a walk from $u$ to $v$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In a tree, betweenness is metric additivity, $d(u,m)+d(m,v)=d(u,v)$. Walking from $u$ to $v$
+one step at a time, the images move by at most $2D$, so some step brackets the separating
+vertex; the additivity then bounds its distance to that image by $D$. The stability constant
+is $D$ itself.
+\end{proof}
+
+\begin{theorem}[Hairs against lines]
+\label{thm:hair-separation}
+\uses{lem:stability}
+\lean{BranchingProcess.not_quasiIsometric_of_hair_of_line}
+\leanok
+A tree carrying hairs of unbounded depth is not quasi-isometric to a tree all of whose
+vertices lie within a bounded distance of a line.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Suppose $f$ is a $D$-quasi-isometry and take a hair at $c$ of depth $h$ far exceeding $D$ and
+the bound $R$ on the distance to a line. The image of $c$ sits within $R$ of a line, and one
+of the two half-rays of that line runs away from the image of the hair through the image of
+$c$. Deep points of the hair are separated from the rest of the tree by $c$, so
+\cref{lem:stability} places their images within $D$ of that image, contradicting the lower
+quasi-isometry bound once $h$ is large.
+\end{proof}
+
+\begin{theorem}[Three rays]
+\label{thm:three-rays}
+\uses{lem:stability}
+\lean{BranchingProcess.not_quasiIsometric_rayGraph, BranchingProcess.rayGraph_isTree,
+BranchingProcess.dist_ray_branch}
+\leanok
+A tree carrying three rays that pairwise meet only in their common initial vertex is not
+quasi-isometric to $\mathrm{Ray}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Two rays out of a common vertex meeting nowhere else are at distance the sum of their
+parameters. A geodesic in $\mathrm{Ray}$ out of the image of the branch vertex runs along the
+ray, so of the three images two must head the same way; taking both far out, their preimages
+are far apart while their images are close, contradicting the lower bound of \cref{def:qi}.
+\end{proof}
